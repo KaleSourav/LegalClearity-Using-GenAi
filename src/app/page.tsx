@@ -38,7 +38,7 @@ export default function Home() {
       setView('error');
     }
   };
-
+  
   const handleReset = () => {
     setView('upload');
     setDocumentText('');

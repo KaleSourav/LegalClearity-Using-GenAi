@@ -1,11 +1,11 @@
-// src/app/actions.ts
 'use server';
 
 import { summarizeLegalDocument } from '@/ai/flows/summarize-legal-document';
 import { highlightRiskyTerms } from '@/ai/flows/highlight-risky-terms';
 import { defineLegalTerms } from '@/ai/flows/define-legal-terms';
 import { explainSpecificClause } from '@/ai/flows/explain-specific-clause';
-import { extractTextFromPdf } from '@/ai/flows/extract-text-from-pdf';
+import { extractTextFromDocument } from '@/ai/flows/extract-text-from-document';
+
 
 export type AnalysisResult = {
   summary: string;
@@ -59,12 +59,12 @@ export async function explainClause(documentText: string, clause: string, questi
     }
 }
 
-export async function getTextFromPdf(pdfDataUri: string): Promise<string> {
+export async function handleFile(docDataUri: string): Promise<string> {
   try {
-    const result = await extractTextFromPdf({ pdfDataUri });
+    const result = await extractTextFromDocument({ docDataUri });
     return result.text;
   } catch (error) {
-    console.error('Error extracting text from PDF:', error);
-    throw new Error('Failed to extract text from PDF.');
+    console.error('Error extracting text from document:', error);
+    throw new Error('Failed to extract text from document.');
   }
 }

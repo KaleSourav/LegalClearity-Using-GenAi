@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { UploadCloud, FileText } from 'lucide-react';
 import { sampleLegalText } from '@/lib/sample-data';
 import { useToast } from "@/hooks/use-toast";
-import { getTextFromPdf } from '@/app/actions';
+import { handleFile } from '@/app/actions';
 
 type UploadSectionProps = {
   onAnalyze: (text: string) => void;
@@ -35,14 +35,7 @@ export function UploadSection({ onAnalyze }: UploadSectionProps) {
     });
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      readFile(file);
-    }
-  };
-
-  const readFile = (file: File) => {
+  const processFile = async (file: File) => {
     const reader = new FileReader();
 
     if (file.type === 'application/pdf') {
@@ -53,7 +46,7 @@ export function UploadSection({ onAnalyze }: UploadSectionProps) {
             title: "Processing PDF",
             description: "Extracting text from your PDF. This may take a moment.",
           });
-          const extractedText = await getTextFromPdf(dataUri);
+          const extractedText = await handleFile(dataUri);
           setText(extractedText);
            toast({
             title: "File Loaded",
@@ -102,6 +95,14 @@ export function UploadSection({ onAnalyze }: UploadSectionProps) {
     }
   };
 
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+  };
+  
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -125,7 +126,7 @@ export function UploadSection({ onAnalyze }: UploadSectionProps) {
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
     if (file) {
-      readFile(file);
+      processFile(file);
     }
   };
 

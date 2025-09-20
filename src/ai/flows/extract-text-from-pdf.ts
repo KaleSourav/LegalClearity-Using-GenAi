@@ -10,7 +10,9 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import * as pdfjs from 'pdfjs-dist/build/pdf';
+import * as pdfjs from 'pdfjs-dist/legacy/build/pdf';
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const ExtractTextFromPdfInputSchema = z.object({
   pdfDataUri: z

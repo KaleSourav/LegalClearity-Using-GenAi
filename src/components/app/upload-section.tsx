@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { UploadCloud, FileText } from 'lucide-react';
 import { sampleLegalText } from '@/lib/sample-data';
 import { useToast } from "@/hooks/use-toast";
+import { getTextFromPdf } from '@/app/actions';
 
 type UploadSectionProps = {
   onAnalyze: (text: string) => void;
@@ -42,32 +43,63 @@ export function UploadSection({ onAnalyze }: UploadSectionProps) {
   };
 
   const readFile = (file: File) => {
-    if (file.type === 'application/pdf' || file.type.startsWith('image/') || file.type.includes('word')) {
+    const reader = new FileReader();
+
+    if (file.type === 'application/pdf') {
+       reader.onload = async (e) => {
+        const dataUri = e.target?.result as string;
+        try {
+          toast({
+            title: "Processing PDF",
+            description: "Extracting text from your PDF. This may take a moment.",
+          });
+          const extractedText = await getTextFromPdf(dataUri);
+          setText(extractedText);
+           toast({
+            title: "File Loaded",
+            description: `${file.name} has been processed. You can now analyze it.`,
+          });
+        } catch (error) {
+          toast({
+            variant: "destructive",
+            title: "PDF Processing Error",
+            description: "Could not extract text from the PDF. Please try pasting the text manually.",
+          });
+        }
+      };
+      reader.onerror = () => {
+        toast({
+          variant: "destructive",
+          title: "File Read Error",
+          description: `Could not read the file ${file.name}.`,
+        });
+      }
+      reader.readAsDataURL(file);
+    } else if (file.type.startsWith('image/') || file.type.includes('word')) {
       toast({
         variant: "destructive",
         title: "Unsupported File Type",
         description: `Automatic text extraction from ${file.type} is not yet supported. Please paste the text manually.`,
       });
       return;
+    } else {
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        setText(content);
+        toast({
+          title: "File Loaded",
+          description: `${file.name} has been loaded. You can now analyze it.`,
+        });
+      };
+      reader.onerror = () => {
+        toast({
+          variant: "destructive",
+          title: "File Read Error",
+          description: `Could not read the file ${file.name}.`,
+        });
+      }
+      reader.readAsText(file);
     }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const content = e.target?.result as string;
-      setText(content);
-      toast({
-        title: "File Loaded",
-        description: `${file.name} has been loaded. You can now analyze it.`,
-      });
-    };
-    reader.onerror = () => {
-       toast({
-        variant: "destructive",
-        title: "File Read Error",
-        description: `Could not read the file ${file.name}.`,
-      });
-    }
-    reader.readAsText(file);
   };
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
@@ -131,9 +163,9 @@ export function UploadSection({ onAnalyze }: UploadSectionProps) {
               ref={fileInputRef}
               className="hidden"
               onChange={handleFileChange}
-              accept=".txt,.md,.html"
+              accept=".txt,.md,.html,.pdf"
             />
-            <p className="text-xs text-muted-foreground mt-2">(PDF, DOCX, and image OCR coming soon)</p>
+            <p className="text-xs text-muted-foreground mt-2">(DOCX and image OCR coming soon)</p>
           </div>
           
           <div className="relative my-6">

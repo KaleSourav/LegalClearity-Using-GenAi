@@ -5,6 +5,7 @@ import { summarizeLegalDocument } from '@/ai/flows/summarize-legal-document';
 import { highlightRiskyTerms } from '@/ai/flows/highlight-risky-terms';
 import { defineLegalTerms } from '@/ai/flows/define-legal-terms';
 import { explainSpecificClause } from '@/ai/flows/explain-specific-clause';
+import { extractTextFromPdf } from '@/ai/flows/extract-text-from-pdf';
 
 export type AnalysisResult = {
   summary: string;
@@ -56,4 +57,14 @@ export async function explainClause(documentText: string, clause: string, questi
         console.error(`Error explaining clause:`, error);
         return "Sorry, I couldn't provide an explanation for this clause.";
     }
+}
+
+export async function getTextFromPdf(pdfDataUri: string): Promise<string> {
+  try {
+    const result = await extractTextFromPdf({ pdfDataUri });
+    return result.text;
+  } catch (error) {
+    console.error('Error extracting text from PDF:', error);
+    throw new Error('Failed to extract text from PDF.');
+  }
 }

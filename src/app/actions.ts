@@ -1,0 +1,59 @@
+// src/app/actions.ts
+'use server';
+
+import { summarizeLegalDocument } from '@/ai/flows/summarize-legal-document';
+import { highlightRiskyTerms } from '@/ai/flows/highlight-risky-terms';
+import { defineLegalTerms } from '@/ai/flows/define-legal-terms';
+import { explainSpecificClause } from '@/ai/flows/explain-specific-clause';
+
+export type AnalysisResult = {
+  summary: string;
+  risks: {
+    highlightedTerms: string[];
+    explanation: string;
+  };
+};
+
+export async function analyzeDocument(documentText: string): Promise<AnalysisResult> {
+  try {
+    const [summaryResult, risksResult] = await Promise.all([
+      summarizeLegalDocument({ documentText }),
+      highlightRiskyTerms({ documentText }),
+    ]);
+
+    if (!summaryResult || !risksResult) {
+      throw new Error('Failed to get a complete analysis from the AI.');
+    }
+    
+    return {
+      summary: summaryResult.summary,
+      risks: {
+        highlightedTerms: risksResult.highlightedTerms,
+        explanation: risksResult.explanation,
+      },
+    };
+  } catch (error) {
+    console.error("Error in analyzeDocument:", error);
+    throw new Error("Failed to analyze document.");
+  }
+}
+
+export async function defineTerm(term: string): Promise<string> {
+  try {
+    const result = await defineLegalTerms({ term });
+    return result.definition;
+  } catch (error) {
+    console.error(`Error defining term "${term}":`, error);
+    return "Could not find a definition for this term.";
+  }
+}
+
+export async function explainClause(documentText: string, clause: string, question: string): Promise<string> {
+    try {
+        const result = await explainSpecificClause({ documentText, clause, question });
+        return `${result.explanation}\n\nConfidence: ${Math.round(result.confidence * 100)}%`;
+    } catch (error) {
+        console.error(`Error explaining clause:`, error);
+        return "Sorry, I couldn't provide an explanation for this clause.";
+    }
+}

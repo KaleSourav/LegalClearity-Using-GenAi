@@ -10,6 +10,7 @@ import { ResultsView } from '@/components/app/results-view';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Terminal } from 'lucide-react';
+import { HowItWorks } from '@/components/app/how-it-works';
 
 type ViewState = 'upload' | 'loading' | 'results' | 'error';
 
@@ -60,7 +61,12 @@ export default function Home() {
         return <ErrorView error={error} onReset={handleReset} />;
       case 'upload':
       default:
-        return <UploadSection onAnalyze={handleAnalyze} />;
+        return (
+          <>
+            <UploadSection onAnalyze={handleAnalyze} />
+            <HowItWorks />
+          </>
+        );
     }
   };
 

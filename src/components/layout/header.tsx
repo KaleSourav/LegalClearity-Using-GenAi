@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 export function Header() {
   const navItems = [
     { name: 'Home', href: '#' },
-    { name: 'How It Works', href: '#' },
+    { name: 'How It Works', href: '#how-it-works' },
     { name: 'Features', href: '#' },
     { name: 'Legal Library', href: '#' },
     { name: 'Pricing', href: '#' },

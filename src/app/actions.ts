@@ -6,6 +6,7 @@ import { defineLegalTerms } from '@/ai/flows/define-legal-terms';
 import { explainSpecificClause } from '@/ai/flows/explain-specific-clause';
 import { extractTextFromDocument } from '@/ai/flows/extract-text-from-document';
 import { compareLegalDocuments } from '@/ai/flows/compare-legal-documents';
+import { chat } from '@/ai/flows/chatbot';
 
 
 export type AnalysisResult = {
@@ -78,4 +79,14 @@ export async function compareDocuments(document1Text: string, document2Text: str
     console.error('Error comparing documents:', error);
     throw new Error('Failed to compare documents.');
   }
+}
+
+export async function getChatbotResponse(message: string): Promise<string> {
+    try {
+        const result = await chat({ message });
+        return result.response;
+    } catch (error) {
+        console.error('Error in chatbot:', error);
+        return "Sorry, I'm having trouble responding right now. Please try again later.";
+    }
 }

@@ -5,6 +5,7 @@ import { highlightRiskyTerms } from '@/ai/flows/highlight-risky-terms';
 import { defineLegalTerms } from '@/ai/flows/define-legal-terms';
 import { explainSpecificClause } from '@/ai/flows/explain-specific-clause';
 import { extractTextFromDocument } from '@/ai/flows/extract-text-from-document';
+import { compareLegalDocuments } from '@/ai/flows/compare-legal-documents';
 
 
 export type AnalysisResult = {
@@ -66,5 +67,15 @@ export async function handleFile(docDataUri: string): Promise<string> {
   } catch (error) {
     console.error('Error extracting text from document:', error);
     throw new Error('Failed to extract text from document.');
+  }
+}
+
+export async function compareDocuments(document1Text: string, document2Text: string): Promise<string> {
+  try {
+    const result = await compareLegalDocuments({ document1Text, document2Text });
+    return result.comparisonSummary;
+  } catch (error) {
+    console.error('Error comparing documents:', error);
+    throw new Error('Failed to compare documents.');
   }
 }

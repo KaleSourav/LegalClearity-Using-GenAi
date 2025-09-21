@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { UploadCloud } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 export default function ComparePage() {
   const [text1, setText1] = useState('');
@@ -38,11 +38,8 @@ export default function ComparePage() {
 }
 
 function DocumentInput({ text, setText, title }: { text: string, setText: (text: string) => void, title: string }) {
-  const fileInputRef =
-    // @ts-ignore
-    null;
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const triggerFileSelect = () => {
-    // @ts-ignore
     fileInputRef.current?.click();
   };
 
@@ -61,7 +58,6 @@ function DocumentInput({ text, setText, title }: { text: string, setText: (text:
           </Button>
           <input
             type="file"
-            // @ts-ignore
             ref={fileInputRef}
             className="hidden"
             accept=".txt,.md,.html,.pdf"
